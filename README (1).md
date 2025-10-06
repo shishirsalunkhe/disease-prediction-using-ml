@@ -43,7 +43,7 @@ Scikit-learn (ML models)
 Numpy, Pandas (data processing)
 
 📷 Output
-![Disease Predictor GUI](dpml.jpg)
+![Disease Predictor GUI](dpml (1).jpg)
 
 
 GUI Example:
