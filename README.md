@@ -1,61 +1,126 @@
-🧑‍⚕️ Disease Prediction using Machine Learning
+Disease Prediction using Machine Learning
+💻 Project Overview
 
-This project predicts diseases based on user-input symptoms using multiple machine learning algorithms. It provides a GUI interface built with Tkinter and integrates ML models like Decision Tree, Random Forest, Naive Bayes, and K-Nearest Neighbors.
+Project Name: Disease Prediction using Machine Learning
+Developer: Shishir Salunkhe 
+Description:
+This project predicts a disease based on the symptoms you select. It uses three machine learning models—Decision Tree, Random Forest, and Naive Bayes—and shows results in a simple Tkinter GUI.
 
-🚀 Features
+You just select up to 5 symptoms, and the program tells you which disease is most likely.
 
-User-friendly Tkinter GUI for input
+🧠 Machine Learning Models
+1. Decision Tree
 
-Enter patient name and select up to 5 symptoms
+Why: Easy to understand and follow.
 
-Predictions generated using:
+How: Splits data based on symptoms to find the disease.
 
-Decision Tree
+2. Random Forest
 
-Random Forest
+Why: More accurate than a single decision tree.
 
-Naive Bayes
+How: Makes many trees and combines their results for better predictions.
 
-K-Nearest Neighbors (KNN)
+3. Naive Bayes
 
-Multiple predictions displayed for comparison
+Why: Works well with symptoms data (categorical).
 
-Buttons to reset inputs and exit system
+How: Calculates the probability of each disease based on the symptoms you select.
 
-📊 Algorithms Used
+🗂️ Dataset
 
-Decision Tree – rule-based classification
+Training Data: Training.csv
 
-Random Forest – ensemble of decision trees
+Testing Data: Testing.csv
 
-Naive Bayes – probabilistic classifier
+Features: Symptoms (like back_pain, fever, cough)
 
-K-Nearest Neighbors (KNN) – distance-based classifier
+Target: Disease name
 
-🛠️ Tech Stack
+Data Steps:
 
-Python
+Remove extra spaces from columns and disease names.
 
-Tkinter (GUI)
+Convert disease names to numbers so ML can understand.
 
-Scikit-learn (ML models)
+Remove rows with missing disease names.
 
-Numpy, Pandas (data processing)
+Only use symptoms that are in the dataset.
 
-📷 Output
-![Disease Predictor GUI](Output/dpml.jpg)
+🎛️ GUI (Tkinter)
+
+Input: Patient name + select 5 symptoms.
+
+Buttons: Predict using Decision Tree, Random Forest, or Naive Bayes.
+
+Output: Shows the predicted disease.
+
+Colors used:
+
+Background: Light yellow
+
+Labels: Black with yellow text for inputs
+
+Buttons: Green with yellow text
+
+Prediction Output: Orange background with black text
+
+GUI Screenshot:
+![GUI Output](Output/Screenshot 2025-10-09 122626.png)
+
+⚡ How to Use
+
+Install required packages:
+
+pip install pandas numpy scikit-learn
 
 
-GUI Example:
+Keep Training.csv, Testing.csv, and the output folder in the same directory as clean_code.py.
 
-✨ Contributors
+Run the Python script:
 
-Shishir Salunkhe
+python clean_code.py
 
-📌 Future Improvements
 
-Add deep learning models
+Enter patient name and select symptoms.
 
-Improve GUI with symptom search
+Click a button to see which disease is predicted.
 
-Deploy as a web app
+## 🎛️ GUI Output
+
+Here is how the Disease Predictor looks when you run it:
+
+![GUI Output](Output/Screenshot 2025-10-09 122626.png)
+
+
+📈 Accuracy
+
+The program prints accuracy for each model on the test data in the console.
+
+Random Forest usually gives the best results.
+
+📝 Points
+
+Algorithms: Decision Tree (easy to understand), Random Forest (more accurate), Naive Bayes (handles symptoms well).
+
+Data Handling: Remove empty disease labels, only use existing symptoms.
+
+Prediction: Symptoms are converted to numbers, then models predict the disease.
+
+GUI: Tkinter is used for simple input and output.
+
+Performance: Accuracy is checked with a separate testing dataset.
+
+📁 File Structure
+Disease-Prediction-ML/
+│
+├─ clean_code.py          # Main program with GUI
+├─ Training.csv           # Training data
+├─ Testing.csv            # Testing data
+├─ Output/
+│   └─ Screenshot 2025-10-09 122626.png   # GUI Screenshot
+└─ README.md              # This file
+
+👨‍💻 Developer
+
+Shishir Salunkhe – Original creator
