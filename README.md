@@ -55,7 +55,7 @@ You just select up to **5 symptoms**, and the program tells you which disease is
 - **Prediction Output:** Orange background with black text  
 
 **GUI Screenshot:**  
-![GUI Output](Output/Screenshot2025-10-09.png)
+![GUI Output](Output/Screenshot.png)
 
 ---
 
