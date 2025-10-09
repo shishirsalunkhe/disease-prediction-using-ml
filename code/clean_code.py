@@ -2,23 +2,20 @@
 # 💻 PROJECT: Disease Prediction using Machine Learning
 # 🧠 Developer: Shishir Salunkhe 
 # 📋 Description:
-#     This project predicts a disease based on symptoms selected by the user.
-#     It uses three Machine Learning algorithms:
-#         1️⃣ Decision Tree
-#         2️⃣ Random Forest
-#         3️⃣ Naive Bayes
-#     A GUI (Graphical User Interface) is created using Tkinter to make it user-friendly.
+#     Predicts a disease based on selected symptoms using Decision Tree, Random Forest, and Naive Bayes.
+#     GUI created using Tkinter for user-friendly interaction.
 # =====================================================================================================
 
-# ------------------------------------- IMPORTING LIBRARIES -------------------------------------------
-from tkinter import *           # Tkinter → Used to create GUI windows, labels, buttons, dropdowns, etc.
-import numpy as np              # NumPy → For numerical operations and converting data into arrays
-import pandas as pd             # Pandas → For loading and handling datasets (CSV files)
-# from gui_stuff import *        # (Commented) Optional GUI styling file (not required to run the app)
+from tkinter import *                 # Tkinter for GUI
+import pandas as pd                    # Pandas for data handling
+import numpy as np                     # NumPy for numerical operations
+from sklearn.tree import DecisionTreeClassifier      # Decision Tree model
+from sklearn.ensemble import RandomForestClassifier  # Random Forest model
+from sklearn.naive_bayes import GaussianNB           # Naive Bayes model
+from sklearn.metrics import accuracy_score           # Accuracy evaluation
 
 # ------------------------------------- SYMPTOMS LIST -------------------------------------------------
-# l1 contains all possible symptoms that the model uses to make predictions.
-# Each symptom acts like a "feature" (column) in our training dataset.
+# List of all symptoms used for features in ML models
 l1 = ['back_pain','constipation','abdominal_pain','diarrhoea','mild_fever','yellow_urine',
 'yellowing_of_eyes','acute_liver_failure','fluid_overload','swelling_of_stomach',
 'swelled_lymph_nodes','malaise','blurred_and_distorted_vision','phlegm','throat_irritation',
@@ -29,19 +26,19 @@ l1 = ['back_pain','constipation','abdominal_pain','diarrhoea','mild_fever','yell
 'swollen_extremeties','excessive_hunger','extra_marital_contacts','drying_and_tingling_lips',
 'slurred_speech','knee_pain','hip_joint_pain','muscle_weakness','stiff_neck','swelling_joints',
 'movement_stiffness','spinning_movements','loss_of_balance','unsteadiness',
-'weakness_of_one_body_side','loss_of_smell','bladder_discomfort','foul_smell_of urine',
+'weakness_of_one_body_side','loss_of_smell','bladder_discomfort','foul_smell_of_urine',
 'continuous_feel_of_urine','passage_of_gases','internal_itching','toxic_look_(typhos)',
 'depression','irritability','muscle_pain','altered_sensorium','red_spots_over_body','belly_pain',
-'abnormal_menstruation','dischromic _patches','watering_from_eyes','increased_appetite','polyuria',
+'abnormal_menstruation','dischromic_patches','watering_from_eyes','increased_appetite','polyuria',
 'family_history','mucoid_sputum','rusty_sputum','lack_of_concentration','visual_disturbances',
 'receiving_blood_transfusion','receiving_unsterile_injections','coma','stomach_bleeding',
-'distention_of_abdomen','history_of_alcohol_consumption','fluid_overload','blood_in_sputum',
+'distention_of_abdomen','history_of_alcohol_consumption','blood_in_sputum',
 'prominent_veins_on_calf','palpitations','painful_walking','pus_filled_pimples','blackheads',
 'scurrying','skin_peeling','silver_like_dusting','small_dents_in_nails','inflammatory_nails',
 'blister','red_sore_around_nose','yellow_crust_ooze']
 
 # ------------------------------------- DISEASE LIST --------------------------------------------------
-# disease → list of all diseases (target labels) that the model can predict.
+# List of diseases (target variable for ML models)
 disease = ['Fungal infection','Allergy','GERD','Chronic cholestasis','Drug Reaction',
 'Peptic ulcer diseae','AIDS','Diabetes','Gastroenteritis','Bronchial Asthma','Hypertension',
 'Migraine','Cervical spondylosis','Paralysis (brain hemorrhage)','Jaundice','Malaria',
@@ -51,220 +48,174 @@ disease = ['Fungal infection','Allergy','GERD','Chronic cholestasis','Drug React
 'Hypoglycemia','Osteoarthristis','Arthritis','(vertigo) Paroymsal  Positional Vertigo',
 'Acne','Urinary tract infection','Psoriasis','Impetigo']
 
-# ------------------------------------- INITIALIZING ZERO LIST ----------------------------------------
-# l2 → temporary input vector filled with zeros (length same as number of symptoms).
-# When user selects symptoms, those positions in l2 become 1 (indicating "symptom present").
-l2 = []
-for x in range(0, len(l1)):
-    l2.append(0)
+# ------------------------------------- INITIALIZE ZERO LIST ------------------------------------------
+# List of zeros for initializing symptoms vector (not used in this version)
+l2 = [0]*len(l1)
 
-# ------------------------------------- TRAINING DATA PREPARATION -------------------------------------
-df = pd.read_csv("Training.csv")    # Read the training dataset
+# ------------------------------------- DATA PREPROCESSING --------------------------------------------
+def preprocess_data(train_file, test_file):
+    """
+    Reads CSV files, cleans data, maps diseases to integers,
+    and returns training/testing datasets with existing symptoms.
+    """
+    # Read CSV files
+    df = pd.read_csv(train_file)
+    tr = pd.read_csv(test_file)
 
-# Replace disease names with numeric values for ML model training
-df.replace({'prognosis': {'Fungal infection':0,'Allergy':1,'GERD':2,'Chronic cholestasis':3,
-'Drug Reaction':4,'Peptic ulcer diseae':5,'AIDS':6,'Diabetes ':7,'Gastroenteritis':8,
-'Bronchial Asthma':9,'Hypertension ':10,'Migraine':11,'Cervical spondylosis':12,
-'Paralysis (brain hemorrhage)':13,'Jaundice':14,'Malaria':15,'Chicken pox':16,'Dengue':17,
-'Typhoid':18,'hepatitis A':19,'Hepatitis B':20,'Hepatitis C':21,'Hepatitis D':22,
-'Hepatitis E':23,'Alcoholic hepatitis':24,'Tuberculosis':25,'Common Cold':26,'Pneumonia':27,
-'Dimorphic hemmorhoids(piles)':28,'Heart attack':29,'Varicose veins':30,'Hypothyroidism':31,
-'Hyperthyroidism':32,'Hypoglycemia':33,'Osteoarthristis':34,'Arthritis':35,
-'(vertigo) Paroymsal  Positional Vertigo':36,'Acne':37,'Urinary tract infection':38,
-'Psoriasis':39,'Impetigo':40}}, inplace=True)
+    # Remove extra spaces from column names and prognosis
+    df.columns = df.columns.str.strip()
+    tr.columns = tr.columns.str.strip()
+    df['prognosis'] = df['prognosis'].str.strip()
+    tr['prognosis'] = tr['prognosis'].str.strip()
 
-# Split features and target
-X = df[l1]              # All symptom columns (input)
-y = df[["prognosis"]]   # Disease label (output)
-np.ravel(y)             # Convert to 1D array (required by scikit-learn)
+    # Map disease names to integers for ML models
+    disease_map = {d: i for i, d in enumerate(disease)}
+    df['prognosis'] = df['prognosis'].map(disease_map)
+    tr['prognosis'] = tr['prognosis'].map(disease_map)
 
-# ------------------------------------- TEST DATA PREPARATION -----------------------------------------
-tr = pd.read_csv("Testing.csv")     # Load test dataset
-tr.replace({'prognosis': {'Fungal infection':0,'Allergy':1,'GERD':2,'Chronic cholestasis':3,
-'Drug Reaction':4,'Peptic ulcer diseae':5,'AIDS':6,'Diabetes ':7,'Gastroenteritis':8,
-'Bronchial Asthma':9,'Hypertension ':10,'Migraine':11,'Cervical spondylosis':12,
-'Paralysis (brain hemorrhage)':13,'Jaundice':14,'Malaria':15,'Chicken pox':16,'Dengue':17,
-'Typhoid':18,'hepatitis A':19,'Hepatitis B':20,'Hepatitis C':21,'Hepatitis D':22,
-'Hepatitis E':23,'Alcoholic hepatitis':24,'Tuberculosis':25,'Common Cold':26,'Pneumonia':27,
-'Dimorphic hemmorhoids(piles)':28,'Heart attack':29,'Varicose veins':30,'Hypothyroidism':31,
-'Hyperthyroidism':32,'Hypoglycemia':33,'Osteoarthristis':34,'Arthritis':35,
-'(vertigo) Paroymsal  Positional Vertigo':36,'Acne':37,'Urinary tract infection':38,
-'Psoriasis':39,'Impetigo':40}}, inplace=True)
+    # Drop rows where prognosis is missing
+    df.dropna(subset=['prognosis'], inplace=True)
+    tr.dropna(subset=['prognosis'], inplace=True)
 
-X_test = tr[l1]               # Test features
-y_test = tr[["prognosis"]]    # Test target
-np.ravel(y_test)
+    # Ensure prognosis is integer type
+    df['prognosis'] = df['prognosis'].astype(int)
+    tr['prognosis'] = tr['prognosis'].astype(int)
 
-# ------------------------------------- DECISION TREE FUNCTION ----------------------------------------
+    # Keep only symptoms that exist in dataset
+    existing_symptoms = [sym for sym in l1 if sym in df.columns]
+
+    # Separate features (X) and target (y) for training and testing
+    X_train = df[existing_symptoms].astype(int)
+    y_train = df['prognosis']
+    X_test = tr[existing_symptoms].astype(int)
+    y_test = tr['prognosis']
+
+    return X_train, y_train, X_test, y_test, existing_symptoms
+
+# Load processed data
+X, y, X_test, y_test, available_symptoms = preprocess_data("Training.csv", "Testing.csv")
+
+# ------------------------------------- HELPER FUNCTION ----------------------------------------------
+def make_input_vector(psymptoms):
+    """
+    Converts user-selected symptoms into binary vector for model prediction.
+    """
+    vec = [0]*len(available_symptoms)  # initialize zero vector
+    for symptom in psymptoms:
+        if symptom in available_symptoms:
+            idx = available_symptoms.index(symptom)
+            vec[idx] = 1  # mark 1 for present symptoms
+    return [vec]
+
+# ------------------------------------- CLASSIFIER FUNCTIONS ------------------------------------------
 def DecisionTree():
-    from sklearn import tree                       # Import Decision Tree Classifier
-    from sklearn.metrics import accuracy_score     # To calculate model accuracy
+    """
+    Predict disease using Decision Tree Classifier.
+    """
+    clf = DecisionTreeClassifier()  # initialize classifier
+    clf.fit(X, y)                   # train model
+    y_pred = clf.predict(X_test)
+    print("Decision Tree Accuracy:", accuracy_score(y_test, y_pred))  # print accuracy
 
-    clf3 = tree.DecisionTreeClassifier()           # Create Decision Tree object
-    clf3 = clf3.fit(X, y)                          # Train model on training data
-
-    # Check model accuracy
-    y_pred = clf3.predict(X_test)
-    print("Decision Tree Accuracy:", accuracy_score(y_test, y_pred))
-
-    # Get user symptoms from dropdowns
+    # Get symptoms from user input
     psymptoms = [Symptom1.get(), Symptom2.get(), Symptom3.get(), Symptom4.get(), Symptom5.get()]
+    predicted = clf.predict(make_input_vector(psymptoms))[0]  # predict disease
 
-    # Convert user symptoms into binary input vector
-    for k in range(0, len(l1)):
-        for z in psymptoms:
-            if z == l1[k]:
-                l2[k] = 1
+    # Display result in Text widget
+    t1.delete("1.0", END)
+    t1.insert(END, disease[predicted] if predicted in range(len(disease)) else "Not Found")
 
-    inputtest = [l2]
-    predict = clf3.predict(inputtest)
-    predicted = predict[0]
-
-    # Map numeric prediction to disease name
-    if predicted in range(len(disease)):
-        t1.delete("1.0", END)
-        t1.insert(END, disease[predicted])
-    else:
-        t1.delete("1.0", END)
-        t1.insert(END, "Not Found")
-
-# ------------------------------------- RANDOM FOREST FUNCTION ----------------------------------------
-def randomforest():
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.metrics import accuracy_score
-
-    clf4 = RandomForestClassifier()
-    clf4 = clf4.fit(X, np.ravel(y))
-
-    y_pred = clf4.predict(X_test)
+def RandomForest():
+    """
+    Predict disease using Random Forest Classifier.
+    """
+    clf = RandomForestClassifier()
+    clf.fit(X, y)
+    y_pred = clf.predict(X_test)
     print("Random Forest Accuracy:", accuracy_score(y_test, y_pred))
 
     psymptoms = [Symptom1.get(), Symptom2.get(), Symptom3.get(), Symptom4.get(), Symptom5.get()]
-    for k in range(0, len(l1)):
-        for z in psymptoms:
-            if z == l1[k]:
-                l2[k] = 1
+    predicted = clf.predict(make_input_vector(psymptoms))[0]
 
-    inputtest = [l2]
-    predict = clf4.predict(inputtest)
-    predicted = predict[0]
+    t2.delete("1.0", END)
+    t2.insert(END, disease[predicted] if predicted in range(len(disease)) else "Not Found")
 
-    if predicted in range(len(disease)):
-        t2.delete("1.0", END)
-        t2.insert(END, disease[predicted])
-    else:
-        t2.delete("1.0", END)
-        t2.insert(END, "Not Found")
-
-# ------------------------------------- NAIVE BAYES FUNCTION ------------------------------------------
 def NaiveBayes():
-    from sklearn.naive_bayes import GaussianNB
-    from sklearn.metrics import accuracy_score
-
-    gnb = GaussianNB()
-    gnb = gnb.fit(X, np.ravel(y))
-
-    y_pred = gnb.predict(X_test)
+    """
+    Predict disease using Gaussian Naive Bayes Classifier.
+    """
+    clf = GaussianNB()
+    clf.fit(X, y)
+    y_pred = clf.predict(X_test)
     print("Naive Bayes Accuracy:", accuracy_score(y_test, y_pred))
 
     psymptoms = [Symptom1.get(), Symptom2.get(), Symptom3.get(), Symptom4.get(), Symptom5.get()]
-    for k in range(0, len(l1)):
-        for z in psymptoms:
-            if z == l1[k]:
-                l2[k] = 1
+    predicted = clf.predict(make_input_vector(psymptoms))[0]
 
-    inputtest = [l2]
-    predict = gnb.predict(inputtest)
-    predicted = predict[0]
+    t3.delete("1.0", END)
+    t3.insert(END, disease[predicted] if predicted in range(len(disease)) else "Not Found")
 
-    if predicted in range(len(disease)):
-        t3.delete("1.0", END)
-        t3.insert(END, disease[predicted])
-    else:
-        t3.delete("1.0", END)
-        t3.insert(END, "Not Found")
+# ------------------------------------- TKINTER GUI ---------------------------------------------------
+root = Tk()
+root.configure(background='#f5f5f5')  # light gray background of main window
+root.title("Disease Predictor - Pro GUI")
 
-# ------------------------------------- TKINTER GUI CREATION ------------------------------------------
-root = Tk()                          # Create main application window
-root.configure(background='white')   # Set background color
-
-# Variables to store user selections
+# ------------------------ Variables ------------------------
 Symptom1 = StringVar(); Symptom1.set(None)
 Symptom2 = StringVar(); Symptom2.set(None)
 Symptom3 = StringVar(); Symptom3.set(None)
 Symptom4 = StringVar(); Symptom4.set(None)
 Symptom5 = StringVar(); Symptom5.set(None)
-Name = StringVar()
+Name = StringVar()  # patient name input
 
-# -------------------- HEADING --------------------
-w2 = Label(root, text="Disease Predictor using Machine Learning", fg="black", bg="white")
-w2.config(font=("Elephant", 30))
-w2.grid(row=1, column=0, columnspan=2, padx=100)
+# ------------------------ Headings -------------------------
+Label(root, text="Disease Predictor using Machine Learning", 
+      fg="#1a1a1a",       # Dark gray text color
+      bg='#f5f5f5',       # Light gray background (same as window)
+      font=("Helvetica", 24, "bold")).grid(row=0, column=0, columnspan=2, padx=20, pady=10)
 
-w2 = Label(root, text="A Project by Shishir Salunkhe", fg="Black", bg="white")
-w2.config(font=("Aharoni", 20))
-w2.grid(row=2, column=0, columnspan=2, padx=100)
+Label(root, text="A Project by Shishir Salunkhe", 
+      fg="#555555",       # Medium gray text for subheading
+      bg='#f5f5f5',       # Light gray background
+      font=("Helvetica", 16)).grid(row=1, column=0, columnspan=2, padx=20, pady=5)
 
-# -------------------- LABELS --------------------
-NameLb = Label(root, text="Name of the Patient", fg="yellow", bg="black")
-NameLb.grid(row=6, column=0, pady=15, sticky=W)
+# ------------------------ Labels ---------------------------
+label_color = '#1a1a1a'  # Dark gray text for labels
+bg_label = '#f5f5f5'     # Light gray background for labels
 
-S1Lb = Label(root, text="Symptom 1", fg="yellow", bg="black")
-S1Lb.grid(row=7, column=0, pady=10, sticky=W)
+Label(root, text="Name of the Patient", fg=label_color, bg=bg_label,
+      font=("Helvetica", 12, "bold")).grid(row=2, column=0, pady=5, sticky=W)
 
-S2Lb = Label(root, text="Symptom 2", fg="yellow", bg="black")
-S2Lb.grid(row=8, column=0, pady=10, sticky=W)
+for i, text in enumerate(["Symptom 1","Symptom 2","Symptom 3","Symptom 4","Symptom 5"], start=3):
+    Label(root, text=text, fg=label_color, bg=bg_label,
+          font=("Helvetica", 12, "bold")).grid(row=i, column=0, pady=5, sticky=W)
 
-S3Lb = Label(root, text="Symptom 3", fg="yellow", bg="black")
-S3Lb.grid(row=9, column=0, pady=10, sticky=W)
+# Prediction Labels
+Label(root, text="Decision Tree", fg="white", bg="#FF5733").grid(row=9, column=0, pady=5, sticky=W)  # Red-orange background for Decision Tree label, white text
+Label(root, text="Random Forest", fg="white", bg="#FF5733").grid(row=10, column=0, pady=5, sticky=W)   # Same red-orange background for Random Forest label
+Label(root, text="Naive Bayes", fg="white", bg="#FF5733").grid(row=11, column=0, pady=5, sticky=W)      # Same red-orange background for Naive Bayes label
 
-S4Lb = Label(root, text="Symptom 4", fg="yellow", bg="black")
-S4Lb.grid(row=10, column=0, pady=10, sticky=W)
+# ------------------------ Input Fields ---------------------
+OPTIONS = sorted(available_symptoms)
+Entry(root, textvariable=Name, width=30).grid(row=2, column=1)  # Patient name entry (default bg/fg)
+OptionMenu(root, Symptom1, *OPTIONS).grid(row=3, column=1)
+OptionMenu(root, Symptom2, *OPTIONS).grid(row=4, column=1)
+OptionMenu(root, Symptom3, *OPTIONS).grid(row=5, column=1)
+OptionMenu(root, Symptom4, *OPTIONS).grid(row=6, column=1)
+OptionMenu(root, Symptom5, *OPTIONS).grid(row=7, column=1)
 
-S5Lb = Label(root, text="Symptom 5", fg="yellow", bg="black")
-S5Lb.grid(row=11, column=0, pady=10, sticky=W)
+# ------------------------ Buttons --------------------------
+Button(root, text="Decision Tree", command=DecisionTree, bg="#28a745", fg="white", width=15).grid(row=3, column=3, padx=10)  # Green button, white text
+Button(root, text="Random Forest", command=RandomForest, bg="#28a745", fg="white", width=15).grid(row=4, column=3, padx=10)   # Green button, white text
+Button(root, text="Naive Bayes", command=NaiveBayes, bg="#28a745", fg="white", width=15).grid(row=5, column=3, padx=10)        # Green button, white text
 
-# -------------------- OUTPUT LABELS --------------------
-lrLb = Label(root, text="DecisionTree", fg="white", bg="red")
-lrLb.grid(row=15, column=0, pady=10, sticky=W)
+# ------------------------ Output Boxes ---------------------
+t1 = Text(root, height=1, width=40, bg="#ffe066", fg="#1a1a1a")  # Orange-yellow background for Decision Tree result, dark gray text
+t1.grid(row=9, column=1, padx=10)
+t2 = Text(root, height=1, width=40, bg="#ffe066", fg="#1a1a1a")  # Orange-yellow background for Random Forest result, dark gray text
+t2.grid(row=10, column=1, padx=10)
+t3 = Text(root, height=1, width=40, bg="#ffe066", fg="#1a1a1a")  # Orange-yellow background for Naive Bayes result, dark gray text
+t3.grid(row=11, column=1, padx=10)
 
-destreeLb = Label(root, text="RandomForest", fg="white", bg="red")
-destreeLb.grid(row=17, column=0, pady=10, sticky=W)
-
-ranfLb = Label(root, text="NaiveBayes", fg="white", bg="red")
-ranfLb.grid(row=19, column=0, pady=10, sticky=W)
-
-# -------------------- INPUT FIELDS --------------------
-OPTIONS = sorted(l1)   # Sort symptoms alphabetically for dropdowns
-
-NameEn = Entry(root, textvariable=Name)
-NameEn.grid(row=6, column=1)
-
-S1En = OptionMenu(root, Symptom1, *OPTIONS); S1En.grid(row=7, column=1)
-S2En = OptionMenu(root, Symptom2, *OPTIONS); S2En.grid(row=8, column=1)
-S3En = OptionMenu(root, Symptom3, *OPTIONS); S3En.grid(row=9, column=1)
-S4En = OptionMenu(root, Symptom4, *OPTIONS); S4En.grid(row=10, column=1)
-S5En = OptionMenu(root, Symptom5, *OPTIONS); S5En.grid(row=11, column=1)
-
-# -------------------- BUTTONS --------------------
-dst = Button(root, text="DecisionTree", command=DecisionTree, bg="green", fg="yellow")
-dst.grid(row=8, column=3, padx=10)
-
-rnf = Button(root, text="Randomforest", command=randomforest, bg="green", fg="yellow")
-rnf.grid(row=9, column=3, padx=10)
-
-lr = Button(root, text="NaiveBayes", command=NaiveBayes, bg="green", fg="yellow")
-lr.grid(row=10, column=3, padx=10)
-
-# -------------------- TEXT OUTPUT BOXES --------------------
-t1 = Text(root, height=1, width=40, bg="orange", fg="black")
-t1.grid(row=15, column=1, padx=10)
-
-t2 = Text(root, height=1, width=40, bg="orange", fg="black")
-t2.grid(row=17, column=1, padx=10)
-
-t3 = Text(root, height=1, width=40, bg="orange", fg="black")
-t3.grid(row=19, column=1, padx=10)
-
-# -------------------- RUN THE APP --------------------
-root.mainloop()  # Keeps the window running continuously until closed
+# ------------------------ Run App --------------------------
+root.mainloop()  # start GUI event loop
