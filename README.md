@@ -55,7 +55,7 @@ You just select up to **5 symptoms**, and the program tells you which disease is
 - **Prediction Output:** Orange background with black text  
 
 **GUI Screenshot:**  
-![GUI Output](Output/Screenshot_2025-10-09 122626.png)
+![GUI Output](Output/Screenshot_2025-10-09.png)
 
 ---
 
@@ -105,7 +105,7 @@ Disease-Prediction-ML/
 ├─ Training.csv                  # Training data
 ├─ Testing.csv                   # Testing data
 ├─ Output/
-│   └─ Screenshot_2025-10-09_122626.png   # GUI Screenshot
+│   └─ Screenshot_2025-10-09.png   # GUI Screenshot
 └─ README.md                     # This file
 👨‍💻 Developer
 Shishir Salunkhe – Original creator
