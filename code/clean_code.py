@@ -1,6 +1,6 @@
 # =====================================================================================================
 # 💻 PROJECT: Disease Prediction using Machine Learning
-# 🧠 Developer: Mohini Pasi
+# 🧠 Developer: Shishir Salunkhe 
 # 📋 Description:
 #     This project predicts a disease based on symptoms selected by the user.
 #     It uses three Machine Learning algorithms:
@@ -201,7 +201,7 @@ w2 = Label(root, text="Disease Predictor using Machine Learning", fg="black", bg
 w2.config(font=("Elephant", 30))
 w2.grid(row=1, column=0, columnspan=2, padx=100)
 
-w2 = Label(root, text="A Project by Mohini Pasi", fg="Black", bg="white")
+w2 = Label(root, text="A Project by Shishir Salunkhe", fg="Black", bg="white")
 w2.config(font=("Aharoni", 20))
 w2.grid(row=2, column=0, columnspan=2, padx=100)
 
