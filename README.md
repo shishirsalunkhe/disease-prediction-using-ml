@@ -49,7 +49,7 @@ You just select up to **5 symptoms**, and the program tells you which disease is
 - **Output:** Shows the predicted disease  
 
 **Colors Used:**  
-- **Background:** Light yellow  
+- **Background:** grey
 - **Labels:** Black background with yellow text (inputs)  
 - **Buttons:** Green background with yellow text  
 - **Prediction Output:** Orange background with black text  
